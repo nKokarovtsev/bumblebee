@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bumblebee Monitor</title>
+
+    <!--<script src="https://code.highcharts.com/highcharts.js"></script>--> <!--HighCharts-->
+    <script src="../static/scripts/highcharts.js"></script>
+    <script src="../static/scripts/exporting.js"></script>
+    <script src="../static/scripts/offline-exporting.js"></script>
+    <script src="../static/scripts/export-data.js"></script>
+    <script src="../static/scripts/accessibility.js"></script>
+    <script src="../static/scripts/jugalsLib.js"></script>
+   
+ 
+
+
+    <link rel="stylesheet" href="/static/style.css">
+  </head>
+  <body>
+
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>-->
+
+    <nav class="sidebar">
+      <div class="container">
+        <div class="menu">
+          <h2>
+            <span>M</span>ONITOR
+          </h2>
+            <ul>
+              <li>
+                <a href="#">
+                  <span>F</span>IRST <span>B</span>OMBIDARIUM
+                </a>
+              </li>
+              <li>
+                <a href="#"><span>S</span>ECOND <span>B</span>OMBIDARIUM
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <span>T</span>HIRD <span>B</span>OMBIDARIUM
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <span>H</span>OME
+                </a>
+              </li>
+            </ul>
+        </div>
+      
+
+        <div class="note">
+          <h1>Welcome to the bombidarium</h1>
+          <p>Stay notifed</p>
+          <a href="#" class="btn">Learn more</a>
+        </div>
+
+        <div class="sidebar-footer">
+          <p> &copy; Lorem ipsum, dolor</p>
+        </div>
+      </div>
+    </nav>
+
+    <main class="dashboard">
+
+      <div>
+        <h1>
+          Bumblebee Monitor
+        </h1>
+      </div>
+
+      <div class="panel-list">
+
+        <div class="panel-block">
+          <h4>
+            Temperature
+          </h4>
+          <p>
+            <!--37--> {{ data.temperature[-1] | safe }} &deg;C <!--beryom iz flask peremennoy-->
+          </p>
+        </div>
+
+        <div class="panel-block">
+          <h4>
+            Humidity
+          </h4>
+          <p>
+            {{ data.humidity[-1] | safe }} %
+          </p>
+        </div>
+
+        <div class="panel-block">
+          <h4>
+            Massa
+          </h4>
+          <p>
+            {{ data.mass[-1] | safe }} &deg;Kg
+          </p>
+        </div>
+
+        <div class="panel-block">
+          <h4>
+            CO^2
+          </h4>
+          <p>
+            {{ data.co2[-1] | safe }} PPM
+          </p>
+        </div>
+
+        <div class="panel-block">
+          <h4>
+            &Delta; Lux
+          </h4>
+          <p>
+            {{ data.deLux[-1] | safe }} Lux
+          </p>
+        </div>
+
+        <div class="panel-block">
+          <h4>
+            Microphone
+          </h4>
+          <p>
+            OK
+          </p>
+        </div>
+
+        <div class="panel-block">
+          <h4>
+            flew in/flew out
+          </h4>
+          <p>
+            <!--350 items/ 575 items--> {{ data.flewin[-1] | safe }} / {{ data.flewout[-1] | safe }}
+          </p>
+        </div>
+
+      </div>
+
+      <div class="panel-graphics">
+
+        <div class="datetime">
+
+          <form action="{{url_for('index')}}" method="post">
+            <label>Left time border: </label>
+            <input type="datetime-local" class="date" name="left" value="{{timeless.isoformat('T', 'minutes')}}">
+            <label>Right time border: </label>
+            <input type="datetime-local" class="date" name="right" value="{{timenow.isoformat('T', 'minutes')}}">
+            <button type="submit">Show me the data</button>
+          </form>
+
+        </div>
+        <!--<p>
+          Lorem, ipsum dolor sit amet, consectetur
+          adipisicing elit. Nihil, quaerat? Asperiores
+          repellendus odit placeat provident, consequuntur
+          magni cupiditate molestiae, suscipit eaque harum qui
+          doloremque quibusdam minima. Voluptatum officia doloremque
+          fugiat.
+        </p>-->
+
+        <div id="temperature" style="width:85vw; height:70vh; align-self: center;"></div>
+        <!------------------------1st chart---------------------->
+          <script>
+            var dat = JSON.parse('{{ data | tojson | safe }}');
+          var chart = Highcharts.chart('temperature', {
+            plotOptions: {
+            column: {
+                dataGrouping: {
+                    units: [
+                        ['hour', [1]],
+                        ['day', [1]],
+                        ['month', [1]],
+                        ['year', null]
+                    ],
+                    groupPixelWidth: 100
+                }
+            }
+        },
+            chart: {
+                backgroundColor: 'rgba(42,100,122,0.6)',
+                type: 'line',
+                zoomType: 'xy',
+                style: {
+                    fontFamily: 'monospace',
+                    color: '#ffffff'
+                }
+            },
+            exporting: {
+              chartOptions: {
+                legend: {
+                    itemStyle: {
+                      color: '#ffffff',
+                      fontFamily: 'monospace',},
+                    verticalAlign: 'bottom',
+                    x: 0,
+                    y: 0,
+                    itemMarginTop: 20,
+                    itemMarginBottom: 0
+                  },
+                  yAxis:{
+                    title:{
+                      margin: 50,
+                      style:{
+                        fontSize: 18
+                      },
+                      x: 10
+                    }
+                  }
+
+              },
+              fallbackToExportServer: false,
+              sourceWidth: 1920,
+              sourceHeight: 1080,
+              scale: 1
+            },
+            legend: {
+                itemStyle: {
+                    color: '#ffffff',
+  
+                },
+
+
+            },
+            credits: {
+                enabled: false,
+            },
+            title: {
+                text: 'Data from Bombidarium',
+                align: 'center',
+                style: {
+                    color: '#ffffff'
+                }
+            },
+            tooltip: {
+                animation: true,
+                backgroundColor: '#ffffff',
+                borderColor: 'red',
+                borderRadius: 20,
+                followPointer: true,
+                style: {
+                    color: '#000000'
+                }
+            },
+            xAxis: {
+                //alternateGridColor: '#050108',
+                categories: dat.categories,
+                
+                labels: {
+                    style: {
+                        color: '#ffffff',
+                        fontSize: '1.3vh',
+                        
+                    }  
+                }
+            },
+            yAxis: {
+                //alternateGridColor: '#ffffff',
+                title: {
+                    text: 'Values',
+                    position: {
+                        align: 'center',
+                        x: 20,
+                        y: 10
+                    },
+                    style: {
+                        fontsize: '15px',
+                        color: '#ffffff'
+                    }
+                },
+                labels: {
+                    style: {
+                        color: '#ffffff',
+                        fontSize: '1.5vh',
+                    }  
+                }
+            },
+            series: [{
+                title: {
+                    style: {
+                        color: '#ffffff',
+                        fontsize: '15px'
+                    }  
+                },
+                name: 'Temperature &degC',
+                data: dat.temperature,
+                color: 'orange',
+                //color: 'red'
+                zones: [
+                  {
+                    value: 0,
+
+                    color: '#c10020',
+                    /*fillColor : {
+                    linearGradient : [0, 0, 0, 200],
+                    stops : [
+                      [0, Highcharts.getOptions().colors[2]],
+                      [1, 'rgba(0,47,85,0.8)']
+                    ]
+                  }*/
+                  },
+                  {
+                    value: 8,
+
+                    color: '#1d334a',
+                    /*fillColor : {
+                    linearGradient : [0, 0, 0, 200],
+                    stops : [
+                      [0, Highcharts.getOptions().colors[2]],
+                      [1, 'rgba(29,51,74,0.8)']
+                    ]
+                  }*/
+                  },
+                  {
+                    value: 28,
+                    color: '#ff9900',
+                    /*fillColor : {
+                    linearGradient : [0, 0, 0, 200],
+                    stops : [
+                      [0, Highcharts.getOptions().colors[2]],
+                      [1, 'rgba(255,153,0,0.8)']
+                    ]
+                  },*/
+                  },
+                  {
+                    color: '#ff2400',
+                    /*fillColor : {
+                    linearGradient : [0, 0, 0, 200],
+                    stops : [
+                      [0, Highcharts.getOptions().colors[2]],
+                      [1, 'rgba(255,36,0,0.8)']
+                    ]
+                  },*/
+                  }
+                ]
+
+            },
+
+            {
+                name: 'Humidity (%)',
+                data: dat.humidity,
+                //color: 'blue'
+                zones:
+                [
+                  {
+                    value: 50,
+
+                    fillColor : {
+                    linearGradient : [0, 0, 0, 200],
+                    stops : [
+                      [0, Highcharts.getOptions().colors[2]],
+                      [1, 'rgba(200,0,0,0)']
+                    ]
+                  },
+                  },
+                  {
+                    value: 80,
+
+                    fillColor : {
+                    linearGradient : [0, 0, 0, 200],
+                    stops : [
+                      [0, Highcharts.getOptions().colors[2]],
+                      [1, 'rgba(128,0,128,0)']
+                    ]
+                  },
+                  }
+                ]
+
+            },
+            {
+                name: 'CO^2 (PPM)',
+                data: dat.co2,
+                //color: 'yellow'
+                zones: [
+                  {
+                    value: 200,
+
+                    fillColor : {
+                    linearGradient : [0, 0, 0, 300],
+                    stops : [
+                      [0, Highcharts.getOptions().colors[2]],
+                      [1, 'rgba(2,0,0,0)']
+                    ]
+                  }
+                  },
+                  {
+                    value: 400,
+
+                    fillColor : {
+                    linearGradient : [0, 0, 0, 300],
+                    stops : [
+                      [0, Highcharts.getOptions().colors[2]],
+                      [1, 'rgba(2,0,0,0)']
+                    ]
+                  }
+                  },
+                  {
+                    fillColor : {
+                    linearGradient : [0, 0, 0, 300],
+                    stops : [
+                      [0, Highcharts.getOptions().colors[2]],
+                      [1, 'rgba(2,153,10,0)']
+                    ]
+                  }
+                  }
+                ],
+
+                  dataLabels: {
+                    color: Highcharts.color(Highcharts.getOptions().colors[255]).brighten(-0.5).get()
+                  }
+            },
+        ]
+        })
+        </script>
+        <!------------------------2nd chart---------------------->
+        <div id="massa" style="width: 85vw; height: 70vh; align-self: center;"></div> 
+          <script>
+            var dat = JSON.parse('{{ data | tojson | safe }}');
+            var chart = Highcharts.chart('massa', {
+            chart: {
+              backgroundColor: 'rgba(42,100,122,0.6)',
+                type: 'column',
+                zoomType: 'xy',
+                style: {
+                    fontFamily: 'monospace',
+                    color: '#ffffff'
+                }
+            },
+            exporting: {
+              chartOptions: {
+                chart:{
+                  marginRight: 20
+                },
+                legend: {
+                    itemStyle: {
+                      color: '#ffffff',
+                      fontFamily: 'monospace',},
+                    verticalAlign: 'bottom',
+                    x: 0,
+                    y: 0,
+                    itemMarginTop: 20,
+                    itemMarginBottom: 0
+                  },
+                  yAxis:{
+                    title:{
+                      margin: 40,
+                      style:{
+                        fontSize: 18
+                      },
+                      x: 10
+                    }
+                  }
+
+              },
+              fallbackToExportServer: false,
+              sourceWidth: 1920,
+              sourceHeight: 1080,
+              scale: 1
+            },
+            legend: {
+                itemStyle: {
+                    color: '#ffffff'
+                }
+            },
+            credits: {
+                enabled: false,
+            },
+            title: {
+                text: 'Data from Bombidarium',
+                align: 'center',
+                style: {
+                    color: '#ffffff'
+                }
+            },
+            //color: ['#1C110A', '#E4D6A7', '#E9B44C', '#E9B2915', '#50A2A7'],
+            tooltip: {
+                animation: false,
+                backgroundColor: '#ffffff',
+                borderColor: 'red',
+                borderRadius: 20,
+                followPointer: true,
+                style: {
+                    color: '#000000'
+                }
+            },
+            xAxis: {
+                //alternateGridColor: '#050108',
+                categories: dat.categories,
+                
+                labels: {
+                    style: {
+                        color: '#ffffff',
+                        fontsize: '50px',
+                    }  
+                }
+            },
+            yAxis: {
+                //alternateGridColor: '#ffffff',
+                title: {
+                    text: 'Values',
+                    position: {
+                        align: 'center',
+                        x: 20,
+                        y: 10
+                    },
+                    style: {
+                        fontsize: '15px',
+                        color: '#ffffff'
+                    }
+                },
+                labels: {
+                    style: {
+                        color: '#ffffff',
+                        fontsize: '50px',
+                    }  
+                }
+            },
+            series: [{
+                title: {
+                    style: {
+                        color: '#ffffff',
+                        fontsize: '15px'
+                    }  
+                },
+                name: '&Delta; Massa',
+                negativeColor: 'purple',
+                data: dat.mass,
+                //color: 'red'
+                fillColor : {
+                    linearGradient : [0, 0, 0, 300],
+                    stops : [
+                      [0, Highcharts.getOptions().colors[2]],
+                      [1, 'rgba(2,0,0,0)']
+                    ]
+                  },
+            }, 
+              {
+                  name: 'flew in',
+                  data: dat.flewin,
+                  //color: 'blue'
+                  fillColor : {
+                      linearGradient : [0, 0, 0, 200],
+                      stops : [
+                        [0, Highcharts.getOptions().colors[2]],
+                        [1, 'rgba(200,0,0,0)']
+                      ]
+                    },
+              },
+              {
+                  name: 'flew out',
+                  data: dat.flewout,
+                  //color: 'blue'
+                  fillColor : {
+                      linearGradient : [0, 0, 0, 200],
+                      stops : [
+                        [0, Highcharts.getOptions().colors[2]],
+                        [1, 'rgba(200,0,0,0)']
+                      ]
+                    },
+              },
+              {
+                  name: '&Delta; Lux',
+                  data: dat.deLux,
+                  //color: 'yellow'
+                  fillColor : {
+                      linearGradient : [0, 0, 0,250],
+                      stops : [
+                        [0, Highcharts.getOptions().colors[2]],
+                        [1, 'rgba(2,0,0,0)']
+                      ]
+                    },
+                    dataLabels: {
+                      color: Highcharts.color(Highcharts.getOptions().colors[255]).brighten(-0.5).get()
+                    }
+              },
+          ]
+          });
+          </script>
+        <div id="microphone" style="width: 85vw; height: 70vh; align-self: center;"></div>
+        <!------------------------3rd chart---------------------->
+          <script>
+            var dat = JSON.parse('{{ data | tojson | safe }}');
+            var chart = Highcharts.chart('microphone', {
+            chart: {
+              backgroundColor: 'rgba(42,100,122,0.6)',
+                type: 'column',
+                zoomType: 'xy',
+                style: {
+                    fontFamily: 'monospace',
+                    color: '#ffffff'
+                }
+            },
+            exporting: {
+              chartOptions: {
+                chart:{
+                  marginRight: 20
+                },
+                legend: {
+                    itemStyle: {
+                      color: '#ffffff',
+                      fontFamily: 'monospace',},
+                    verticalAlign: 'bottom',
+                    x: 0,
+                    y: 0,
+                    itemMarginTop: 20,
+                    itemMarginBottom: 0
+                  },
+                  yAxis:{
+                    title:{
+                      margin: 40,
+                      style:{
+                        fontSize: 18
+                      },
+                      x: 10
+                    }
+                  }
+
+              },
+              fallbackToExportServer: false,
+              sourceWidth: 1920,
+              sourceHeight: 1080,
+              scale: 1
+            },
+            legend: {
+                itemStyle: {
+                    color: '#ffffff'
+                }
+            },
+            credits: {
+                enabled: false,
+            },
+            title: {
+                text: 'Data from Bombidarium',
+                align: 'center',
+                style: {
+                    color: '#ffffff'
+                }
+            },
+            //color: ['#1C110A', '#E4D6A7', '#E9B44C', '#E9B2915', '#50A2A7'],
+            tooltip: {
+                animation: false,
+                backgroundColor: '#ffffff',
+                borderColor: 'red',
+                borderRadius: 20,
+                followPointer: true,
+                style: {
+                    color: '#000000'
+                }
+            },
+            xAxis: {
+                //alternateGridColor: '#050108',
+                categories: dat.categories,
+                
+                labels: {
+                    style: {
+                        color: '#ffffff',
+                        fontsize: '50px',
+                    }  
+                }
+            },
+            yAxis: {
+                //alternateGridColor: '#ffffff',
+                title: {
+                    text: 'Values',
+                    position: {
+                        align: 'center',
+                        x: 20,
+                        y: 10
+                    },
+                    style: {
+                        fontsize: '15px',
+                        color: '#ffffff'
+                    }
+                },
+                labels: {
+                    style: {
+                        color: '#ffffff',
+                        fontsize: '50px',
+                    }  
+                }
+            },
+            series: [{
+                title: {
+                    style: {
+                        color: '#ffffff',
+                        fontsize: '15px'
+                    }  
+                },
+                name: 'Hz',
+                data: dat.micrococ,
+                color: 'red',
+                fillColor : {
+                    linearGradient : [0, 0, 0, 300],
+                    stops : [
+                      [0, Highcharts.getOptions().colors[2]],
+                      [1, 'rgba(2,0,0,0)']
+                    ]
+                  },
+            }, 
+        ]
+        });
+          </script>
+
+      </div>
+
+      <!--script src="../static/scripts/index.js"></script-->
+
+    </main>
+
+  </body>
+
+</html> 
